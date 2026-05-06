@@ -80,13 +80,16 @@ def rnn_cell(module_name, hidden_dim):
   
   # GRU
   if (module_name == 'gru'):
-    rnn_cell = tf.compat.v1.nn.rnn_cell.GRUCell(num_units=hidden_dim, activation=tf.nn.tanh)
+    rnn_cell = tf.keras.layers.GRUCell(units=hidden_dim, activation='tanh')
   # LSTM
   elif (module_name == 'lstm'):
-    rnn_cell = tf.compat.v1.nn.rnn_cell.BasicLSTMCell(num_units=hidden_dim, activation=tf.nn.tanh)
+    rnn_cell = tf.keras.layers.LSTMCell(units=hidden_dim, activation='tanh')
   # LSTM Layer Normalization
+  # Note: tf.contrib was removed in TF2. The direct equivalent
+  # (LayerNormLSTMCell) requires tensorflow_addons which is not
+  # available on Kaggle. Falling back to standard LSTMCell.
   elif (module_name == 'lstmLN'):
-    rnn_cell = tf.contrib.rnn.LayerNormBasicLSTMCell(num_units=hidden_dim, activation=tf.nn.tanh)
+    rnn_cell = tf.keras.layers.LSTMCell(units=hidden_dim, activation='tanh')
   return rnn_cell
 
 

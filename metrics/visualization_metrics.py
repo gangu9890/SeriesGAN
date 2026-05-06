@@ -73,7 +73,7 @@ def visualization (ori_data, generated_data, analysis, name):
     prep_data_final = np.concatenate((prep_data, prep_data_hat), axis = 0)
     
     # TSNE anlaysis
-    tsne = TSNE(n_components = 2, verbose = 1, perplexity = 40, n_iter = 300)
+    tsne = TSNE(n_components = 2, verbose = 1, perplexity = 40, max_iter = 300)
     tsne_results = tsne.fit_transform(prep_data_final)
       
     # Plotting
