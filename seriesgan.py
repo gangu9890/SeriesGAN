@@ -7,6 +7,7 @@ warnings.filterwarnings('ignore')
 
 import numpy as np
 import tensorflow as tf
+tf.compat.v1.enable_eager_execution()
 
 from tensorflow.keras import Model
 from tensorflow.keras.layers import (
@@ -371,13 +372,13 @@ def seriesgan(ori_data, parameters, num_samples='same'):
                 zip(d_grads, d_vars)
             )
 
-        if epoch % 100 == 0:
+        if epoch % 10 == 0:
 
             print(
                 f'Epoch {epoch}/{iterations} | '
-                f'E_loss: {e_loss.numpy():.4f} | '
-                f'G_loss: {g_loss.numpy():.4f} | '
-                f'D_loss: {d_loss.numpy():.4f}'
+                f'E_loss: {float(e_loss):.4f} | '
+                f'G_loss: {float(g_loss):.4f} | '
+                f'D_loss: {float(d_loss):.4f}'
             )
 
     print('Finish Training')
@@ -403,7 +404,7 @@ def seriesgan(ori_data, parameters, num_samples='same'):
 
     generated_data = recovery(H_hat)
 
-    generated_data = generated_data.numpy()
+    generated_data = tf.keras.backend.eval(generated_data)
 
     # Renormalization
     generated_data = generated_data * max_val
@@ -423,7 +424,7 @@ if __name__ == '__main__':
     parameters = {
         'hidden_dim': 24,
         'num_layer': 3,
-        'iterations': 1000,
+        'iterations': 20,   # smoke test — change to 1000 for full training
         'batch_size': 32
     }
 
