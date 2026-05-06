@@ -253,16 +253,6 @@ def seriesgan(ori_data, parameters, num_samples='same'):
     d_optimizer = Adam()
 
     # ------------------------------------------------------------
-    # Dataset
-    # ------------------------------------------------------------
-
-    dataset = tf.data.Dataset.from_tensor_slices(ori_data)
-
-    dataset = dataset.shuffle(buffer_size=no)
-
-    dataset = dataset.batch(batch_size)
-
-    # ------------------------------------------------------------
     # Training
     # ------------------------------------------------------------
 
@@ -270,7 +260,16 @@ def seriesgan(ori_data, parameters, num_samples='same'):
 
     for epoch in range(iterations):
 
-        for X_mb in dataset:
+        # Shuffle data manually (avoids tf.data eager-mode requirement)
+        idx = np.random.permutation(no)
+        shuffled_data = ori_data[idx]
+
+        for start in range(0, no, batch_size):
+
+            X_mb = tf.convert_to_tensor(
+                shuffled_data[start:start + batch_size],
+                dtype=tf.float32
+            )
 
             batch_current = X_mb.shape[0]
 
