@@ -89,7 +89,7 @@ def seriesgan(ori_data, parameters, num_samples):
 
     # Recovery (Latent AE decoder)
     rec_gru = _make_stacked_gru(num_layers, hidden_dim, name_prefix='rec_gru')
-    rec_dense = tf.keras.layers.Dense(hidden_dim, name='rec_dense')
+    rec_dense = tf.keras.layers.Dense(dim, name='rec_dense')
 
     # Generator
     gen_gru = _make_stacked_gru(num_layers, hidden_dim, name_prefix='gen_gru')
