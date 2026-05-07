@@ -249,7 +249,9 @@ def seriesgan(ori_data, parameters, num_samples):
     GS_solver          = tf.compat.v1.train.AdamOptimizer().minimize(G_loss_S, var_list=g_vars + s_vars)
 
     # ============== Checkpoint ==============
-
+    saver = tf.compat.v1.train.Saver(max_to_keep=20)
+    ckpt_prefix = os.path.join(checkpoint_dir, 'seriesgan_ckpt')
+    pull_checkpoints(checkpoint_dir, drive_folder_id, gdrive_secret)
     sess = tf.compat.v1.Session()
     sess.run(tf.compat.v1.global_variables_initializer())
 
