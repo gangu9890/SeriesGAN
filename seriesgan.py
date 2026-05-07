@@ -21,6 +21,7 @@ from tensorflow.keras.layers import (
 from tensorflow.keras.optimizers import Adam
 
 from metrics.discriminative_metrics import discriminative_score_metrics
+from drive_sync import pull_checkpoints, push_checkpoints
 
 
 # ------------------------------------------------------------
@@ -218,6 +219,13 @@ def seriesgan(ori_data, parameters, num_samples='same'):
     checkpoint_dir   = parameters.get('checkpoint_dir', './seriesgan_checkpoints')
     checkpoint_every = parameters.get('checkpoint_every', 50)  # save every N epochs
 
+    # Google Drive sync (optional — set to your Drive folder ID for persistence)
+    # Colab users: just set checkpoint_dir to a Drive path; leave this None.
+    # Kaggle users: set this to the Drive folder ID and store your service
+    #               account JSON as a Kaggle secret named GDRIVE_SERVICE_ACCOUNT.
+    drive_folder_id = parameters.get('drive_folder_id', None)
+    gdrive_secret   = parameters.get('gdrive_secret', 'GDRIVE_SERVICE_ACCOUNT')
+
     os.makedirs(checkpoint_dir, exist_ok=True)
 
     z_dim = dim
@@ -292,6 +300,13 @@ def seriesgan(ori_data, parameters, num_samples='same'):
         max_to_keep=3,
         checkpoint_name='seriesgan_ckpt'
     )
+
+    # =========================================================
+    # Pull checkpoints from Google Drive before training
+    # (Kaggle only — Colab writes directly to the Drive path)
+    # =========================================================
+
+    pull_checkpoints(checkpoint_dir, drive_folder_id, gdrive_secret)
 
     # Determine which epoch to start from
     start_epoch = 0
@@ -398,10 +413,13 @@ def seriesgan(ori_data, parameters, num_samples='same'):
             if (epoch + 1) % checkpoint_every == 0:
                 save_path = ckpt_manager.save()
                 print(f'[Checkpoint] Saved at epoch {epoch + 1}  →  {save_path}')
+                # Push to Google Drive so the weights survive a disconnection
+                push_checkpoints(checkpoint_dir, drive_folder_id, gdrive_secret)
 
         # Final checkpoint
         save_path = ckpt_manager.save()
         print(f'[Checkpoint] Final save  →  {save_path}')
+        push_checkpoints(checkpoint_dir, drive_folder_id, gdrive_secret)
         print('Finish Training')
 
     # ------------------------------------------------------------
@@ -441,6 +459,13 @@ if __name__ == '__main__':
         'batch_size': 32,
         'checkpoint_dir': './seriesgan_checkpoints',  # folder where weights are saved
         'checkpoint_every': 5,                        # save every N epochs
+
+        # --- Google Drive persistence (optional) ---
+        # Colab:  mount Drive first, then set checkpoint_dir to the Drive path.
+        #         Leave drive_folder_id as None.
+        # Kaggle: set drive_folder_id to your Drive folder ID (see drive_sync.py).
+        'drive_folder_id': None,
+        'gdrive_secret':   'GDRIVE_SERVICE_ACCOUNT',
     }
 
     generated = seriesgan(dummy_data, parameters, 100)
