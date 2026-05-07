@@ -251,25 +251,25 @@ def seriesgan(ori_data, parameters, num_samples):
     # ============== Checkpoint ==============
 
     sess = tf.compat.v1.Session()
-        sess.run(tf.compat.v1.global_variables_initializer())
+    sess.run(tf.compat.v1.global_variables_initializer())
 
     # --- NEW CHECKPOINT LOGIC ---
-        start_step = 0
-        run_pretraining = True
-        latest_ckpt = tf.train.latest_checkpoint(checkpoint_dir)
-        if latest_ckpt:
-            saver.restore(sess, latest_ckpt)
-            print(f'[Checkpoint] Restored from {latest_ckpt}')
-            run_pretraining = False
-            if '-' in latest_ckpt:
-                try:
-                    start_step = int(latest_ckpt.split('-')[-1])
-                except ValueError:
-                    start_step = 0
-        # ----------------------------
-    
-        final_generated = []
-        global_summing = 5
+    start_step = 0
+    run_pretraining = True
+    latest_ckpt = tf.train.latest_checkpoint(checkpoint_dir)
+    if latest_ckpt:
+        saver.restore(sess, latest_ckpt)
+        print(f'[Checkpoint] Restored from {latest_ckpt}')
+        run_pretraining = False
+        if '-' in latest_ckpt:
+            try:
+                start_step = int(latest_ckpt.split('-')[-1])
+            except ValueError:
+                start_step = 0
+    # ----------------------------
+
+    final_generated = []
+    global_summing = 5
 
 
     # ============== Phase 1: Loss Function AE (0.5x iterations) ==============
